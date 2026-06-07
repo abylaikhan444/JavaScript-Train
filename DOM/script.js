@@ -13,15 +13,15 @@ btn.addEventListener('click', () => {
 const input = document.querySelector('#nameInput');
 const btnAdd = document.querySelector('#addBtn');
 const ul = document.querySelector('#list');
-let valueInput = '';
-
-input.addEventListener('input', (event) => {
-    valueInput = input.value;
-})
 
 btnAdd.addEventListener('click', () => {
-    ul.append(valueInput);
-})
+    if (input.value.trim() === '') return; // защита от пустого поля
+
+    const li = document.createElement('li');
+    li.textContent = input.value;
+    ul.append(li);
+    input.value = ''; // очищаем поле после добавления
+});
 
 
 // TASK 3
@@ -34,19 +34,28 @@ btnAdd.addEventListener('click', () => {
 const todoInput = document.querySelector('#todoInput');
 const btnTodo = document.querySelector('#addTodo');
 const ulTodo = document.querySelector('#todoList');
-let taskText = '';
 
-todoInput.addEventListener('input', (event) => {
-    taskText = todoInput.value;
-})
+btnTodo.addEventListener('click', () => {
+    if (todoInput.value.trim() === '') return;
 
-btnTodo.addEventListener('click', (event) => {
-    const newItem = document.createElement('li');
-    newItem.innerHTML = '<button id= deleteBtn>Удалить!</button>';
-    newItem.innerHTML = '<button id= doneBtn>Вычеркнуть!</button>';
-    newItem.append(taskText);
-    ul.append(newItem);
-    newItem.addEventListener('click', () => {
-        newItem.classList.add('.text');
-    })
-})
+    const li = document.createElement('li');
+
+    // Span для текста — на него вешаем toggle done
+    const span = document.createElement('span');
+    span.textContent = todoInput.value;
+    span.addEventListener('click', () => {
+        span.classList.toggle('text');
+    });
+
+    // Кнопка удалить
+    const delBtn = document.createElement('button');
+    delBtn.textContent = 'Удалить';
+    delBtn.addEventListener('click', (event) => {
+        event.stopPropagation(); // не даём клику дойти до li
+        li.remove();
+    });
+
+    li.append(span, delBtn); // добавляем оба элемента в li
+    ulTodo.append(li);
+    todoInput.value = ''; // очищаем поле
+});

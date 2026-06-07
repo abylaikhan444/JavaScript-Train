@@ -155,60 +155,71 @@
 //& TASK 6 Напиши функцию retryLoad(id, attempts) — пытается загрузить данные, и если не получается — повторяет попытку. Максимум attempts попыток.
 //& Используй эту функцию которая иногда падает:
 
-function unreliableLoad(id) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (Math.random() > 0.2) {
-                resolve({ id, name: "Товар " + id });
-            } else {
-                reject("Сервер недоступен");
-            }
-        }, 500);
-    });
-}
+// function unreliableLoad(id) {
+//     return new Promise((resolve, reject) => {
+//         setTimeout(() => {
+//             if (Math.random() > 0.9) {
+//                 resolve({ id, name: "Товар " + id });
+//             } else {
+//                 reject("Сервер недоступен");
+//             }
+//         }, 500);
+//     });
+// }
 
 
-function retryLoad(id, attempts) {
-    return new Promise((resolve, reject) => {
-        unreliableLoad(id)
-            .then((user) => {
-                return resolve(user);
-            })
-            .catch(() => {
-                if (attempts > 1) {
-                    retryLoad(id, attempts - 1)
-                        .then(resolve).catch(reject);
-                }
-            })
-    });
+// function retryLoad(id, attempts) {
+//     return new Promise((resolve, reject) => {
+//         unreliableLoad(id)
+//             .then((user) => {
+//                 resolve(user);
+//             })
+//             .catch((err) => {
+//                 if (attempts > 1) {
+//                     retryLoad(id, attempts - 1)
+//                         .then(resolve).catch(reject);
+//                 } else {
+//                     reject(err);
+//                 }
+//             })
+//     });
 
-}
+// }
 
 
-retryLoad(1, 3)
-    .then(data => console.log("Загружено:", data.name))
-    .catch(err => console.log("Все попытки исчерпаны:", err));
+// retryLoad(1, 3)
+//     .then(data => console.log("Загружено:", data.name))
+//     .catch(err => console.log("Все попытки исчерпаны:", err));
 
 
 
 //& TASK 7 Напиши функцию loadCart(userIds) которая принимает массив id пользователей,
 //& загружает их параллельно, и возвращает только тех у кого age >= 18.
 
-// function loadUser(id) {
-//     return new Promise(resolve => {
-//         setTimeout(() => {
-//             const users = {
-//                 1: { id: 1, name: "Анна", age: 17 },
-//                 2: { id: 2, name: "Борис", age: 23 },
-//                 3: { id: 3, name: "Вера", age: 15 },
-//                 4: { id: 4, name: "Григорий", age: 31 }
-//             };
-//             resolve(users[id]);
-//         }, 500);
-//     });
-// }
+function loadUser(id) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            const users = {
+                1: { id: 1, name: "Анна", age: 17 },
+                2: { id: 2, name: "Борис", age: 23 },
+                3: { id: 3, name: "Вера", age: 15 },
+                4: { id: 4, name: "Григорий", age: 31 }
+            };
+            resolve(users[id]);
+        }, 500);
+    });
+}
 
-// loadCart([1, 2, 3, 4]).then(adults => {
-//     console.log(adults);
-//     [{ id: 2, name: "Борис", age: 23 }, { id: 4, name: "Григорий", age: 31 }]
-// });
+function loadCart(userIds) {
+    return Promise.all(
+        userIds.map(id => loadUser(id))
+    )
+        .then((users) => {
+            return users.filter(user => user.age >= 18);
+        })
+}
+
+loadCart([1, 2, 3, 4]).then(adults => {
+    console.log(adults);
+    // [{ id: 2, name: "Борис", age: 23 }, { id: 4, name: "Григорий", age: 31 }]
+});

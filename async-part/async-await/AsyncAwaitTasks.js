@@ -18,40 +18,40 @@
 
 // main();
 
-//& TASK 2 Напиши async функцию getUserName(id) которая загружает пользователя и возвращает его имя. Если не найден — выбрасывает ошибку:
+// // & TASK 2 Напиши async функцию getUserName(id) которая загружает пользователя и возвращает его имя. Если не найден — выбрасывает ошибку:
 
-function loadUser(id) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            const users = { 1: "Давид", 2: "Анна", 3: "Абылай" };
-            if (users[id]) {
-                resolve(users[id]);
-            } else {
-                reject("Error!");
-            }
-        }, 2000)
-    });
-}
+// function loadUser(id) {
+//     return new Promise((resolve, reject) => {
+//         setTimeout(() => {
+//             const users = { 1: "Давид", 2: "Анна", 3: "Абылай" };
+//             if (users[id]) {
+//                 resolve(users[id]);
+//             } else {
+//                 reject("Error!");
+//             }
+//         }, 2000)
+//     });
+// }
 
-async function getUserName(id) {
-    try {
-        const userName = await loadUser(id);
-        console.log(userName);
-        return userName;
-    } catch (error) {
-        console.log(error);
-        throw error;
-    }
-}
+// async function getUserName(id) {
+//     try {
+//         const userName = await loadUser(id);
+//         console.log(userName);
+//         return userName;
+//     } catch (error) {
+//         console.log(error);
+//         throw error;
+//     }
+// }
 
-getUserName(5)
-    .then(name => console.log(name))
-    .catch(err => console.log('Ошибка:', err)); // "Ошибка: Error!"
-
-
+// getUserName(5)
+//     .then(name => console.log(name))
+//     .catch(err => console.log('Ошибка:', err)); // "Ошибка: Error!"
 
 
-//& TASK 3 Перепиши loadUserWithOrders через async/await:
+
+
+// // & TASK 3 Перепиши loadUserWithOrders через async/await:
 
 // function loadUser(id) {
 //     return new Promise(resolve =>
@@ -68,25 +68,48 @@ getUserName(5)
 //     );
 // }
 
+// async function loadUserWithOrders(userId) {
+//     const user = await loadUser(userId);
+//     const orders = await loadOrders(userId);
+//     console.log(user, orders);
+//     return { user, orders };
+// }
+
+// loadUserWithOrders(1)
+
 // Напиши async функцию loadUserWithOrders(userId)
 // результат: { user, orders }
 
 
 //& TASK 4 loadWithRetry через async/await и цикл вместо рекурсии:
 
-// function unreliableLoad(id) {
-//     return new Promise((resolve, reject) => {
-//         setTimeout(() => {
-//             if (Math.random() > 0.5) resolve({ id, name: "Товар " + id });
-//             else reject("Сервер недоступен");
-//         }, 300);
-//     });
-// }
+function unreliableLoad(id) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (Math.random() > 0.5) resolve({ id, name: "Товар " + id });
+            else reject("Сервер недоступен");
+        }, 3000);
+    });
+}
+
+async function loadWithRetry(id, attempts) {
+    for (let i = 0; i < attempts; i++) {
+        try {
+            const data = await unreliableLoad(id);
+            return data;
+        } catch (error) {
+            console.log(`Попытка ${i + 1} не удалась: ${error}`);
+            // если это последняя попытка — не нужно говорить "повторяю"
+            if (i < attempts - 1) console.log('Повторяю...');
+        }
+    }
+    throw "Все попытки исчерпаны";
+}
 
 // Используй for или while — без рекурсии
-// retryLoad(1, 3)
-//     .then(data => console.log("Загружено:", data.name))
-//     .catch(err => console.log("Все попытки исчерпаны:", err));
+loadWithRetry(1, 3)
+    .then(data => console.log("Загружено:", data.name))
+    .catch(err => console.log("Все попытки исчерпаны:", err));
 
 
 
