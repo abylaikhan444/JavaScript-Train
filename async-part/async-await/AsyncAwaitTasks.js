@@ -81,39 +81,39 @@
 // результат: { user, orders }
 
 
-//& TASK 4 loadWithRetry через async/await и цикл вместо рекурсии:
+// // & TASK 4 loadWithRetry через async/await и цикл вместо рекурсии:
 
-function unreliableLoad(id) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            if (Math.random() > 0.5) resolve({ id, name: "Товар " + id });
-            else reject("Сервер недоступен");
-        }, 3000);
-    });
-}
+// function unreliableLoad(id) {
+//     return new Promise((resolve, reject) => {
+//         setTimeout(() => {
+//             if (Math.random() > 0.5) resolve({ id, name: "Товар " + id });
+//             else reject("Сервер недоступен");
+//         }, 3000);
+//     });
+// }
 
-async function loadWithRetry(id, attempts) {
-    for (let i = 0; i < attempts; i++) {
-        try {
-            const data = await unreliableLoad(id);
-            return data;
-        } catch (error) {
-            console.log(`Попытка ${i + 1} не удалась: ${error}`);
-            // если это последняя попытка — не нужно говорить "повторяю"
-            if (i < attempts - 1) console.log('Повторяю...');
-        }
-    }
-    throw "Все попытки исчерпаны";
-}
+// async function loadWithRetry(id, attempts) {
+//     for (let i = 0; i < attempts; i++) {
+//         try {
+//             const data = await unreliableLoad(id);
+//             return data;
+//         } catch (error) {
+//             console.log(`Попытка ${i + 1} не удалась: ${error}`);
+//             // если это последняя попытка — не нужно говорить "повторяю"
+//             if (i < attempts - 1) console.log('Повторяю...');
+//         }
+//     }
+//     throw "Все попытки исчерпаны";
+// }
 
-// Используй for или while — без рекурсии
-loadWithRetry(1, 3)
-    .then(data => console.log("Загружено:", data.name))
-    .catch(err => console.log("Все попытки исчерпаны:", err));
+// // Используй for или while — без рекурсии
+// loadWithRetry(1, 3)
+//     .then(data => console.log("Загружено:", data.name))
+//     .catch(err => console.log("Все попытки исчерпаны:", err));
 
 
 
-//& TASK 5 fetchUserStats — загрузи пользователя, потом параллельно заказы и сообщения:
+// //& TASK 5 fetchUserStats — загрузи пользователя, потом параллельно заказы и сообщения:
 
 // function loadUser(id) {
 //     return new Promise(r => setTimeout(() => r({ id, name: "Давид" }), 500));
@@ -124,6 +124,23 @@ loadWithRetry(1, 3)
 // function loadMessages(id) {
 //     return new Promise(r => setTimeout(() => r(["привет", "как дела"]), 600));
 // }
+
+// async function fetchUserStats(id) {
+//     const user = await loadUser(id);
+//     const [orders, messages] = await Promise.all([
+//         loadOrders(id),
+//         loadMessages(id)
+//     ]);
+//     const orderResult = orders.length;
+//     const messagesResult = messages.length;
+//     return {
+//         user: user,
+//         orderCount: orderResult,
+//         messagesCount: messagesResult
+//     }
+// }
+
+// fetchUserStats(1);
 
 // fetchUserStats(1) должна вернуть:
 // {
@@ -136,18 +153,18 @@ loadWithRetry(1, 3)
 
 //& TASK 6 Пагинация — загружай страницы пока не получишь пустой массив:
 
-// function fetchPage(page) {
-//     return new Promise(resolve => {
-//         setTimeout(() => {
-//             const data = {
-//                 1: [{ name: "Товар 1" }, { name: "Товар 2" }],
-//                 2: [{ name: "Товар 3" }, { name: "Товар 4" }],
-//                 3: [] // конец
-//             };
-//             resolve(data[page] || []);
-//         }, 300);
-//     });
-// }
+function fetchPage(page) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            const data = {
+                1: [{ name: "Товар 1" }, { name: "Товар 2" }],
+                2: [{ name: "Товар 3" }, { name: "Товар 4" }],
+                3: [] // конец
+            };
+            resolve(data[page] || []);
+        }, 300);
+    });
+}
 
 // loadPage() должна вернуть все товары:
 // [{ name: "Товар 1" }, { name: "Товар 2" }, { name: "Товар 3" }, { name: "Товар 4" }]
